@@ -1,0 +1,11 @@
+## code to prepare `binmix` dataset goes here
+
+set.seed(51122)
+n <- 500
+binmix <- data.frame(x1=runif(n),x2=runif(n),x3=runif(n),x4=runif(n),x5=runif(n),x6=runif(n),x7=runif(n),x8=runif(n),x9=runif(n),x10=runif(n))
+binmix$l <- binmix$x1*1.5-binmix$x2*0.5-binmix$x3+binmix$x4*0.25+binmix$x5*0.75
+binmix$nl <- sin(pi*binmix$x1*binmix$x2) - 4*(binmix$x3-0.5)^2 + 1*(binmix$x4>0.3) + 0.5*binmix$x5 - 0.8
+binmix$bp <- 0.4*binmix$l + (1-0.4)*binmix$nl
+binmix$p <- pnorm(binmix$bp)
+binmix$y <- rbinom(n, 1, prob=binmix$p)
+usethis::use_data(binmix, overwrite = TRUE)

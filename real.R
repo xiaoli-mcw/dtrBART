@@ -29,6 +29,10 @@ realdata <- read.csv(file="~/BART/a3/data/all.comp.cases.csv")
 ##  $ Y1.tilde   time to A2          : num  2.237 0.691 13.322 53.158 5.822 ...
 ##  $ delta1               : int  1 1 1 0 1 1 1 1 1 1 ...
 
+table(a1=realdata[realdata$Int2==1,]$A1.NHTL,a2=realdata[realdata$Int2==1,]$A2.NHTL)
+mean(realdata$A1.NHTL)
+mean(realdata[realdata$Int2==1,]$A2.NHTL)
+
 varnames <- names(realdata)
 varlist <- varnames[c(8,9,11,13,14,15,16)]
 realdata[,varlist] <- lapply(realdata[,varlist], as.factor)

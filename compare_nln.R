@@ -65,17 +65,17 @@ bias.b2 <- res.b$yhat2comb-t2mat
 bias.b1 <- res.b$yhat1comb-tmat
 mse.b <- data.frame(stg2=colMeans(bias.b2^2), stg1=colMeans(bias.b1^2))
 
-method <- rep(c("Oracle","Linear","Interaction","BART"), each=2) #
+method <- rep(factor(1:4, label=c("Linear","Interaction","BART","Oracle")), each=2) #
 split <- factor(0:1, label=c("Bias^2","Variance"))
-value <- rbind(c(mean(colMeans(bias.oras2)^2),mean(colMeans(bias.oras1)^2)), colMeans(mse.ora)-c(mean(colMeans(bias.oras2)^2),mean(colMeans(bias.oras1)^2)), c(mean(colMeans(bias.lins2)^2),mean(colMeans(bias.lins1)^2)), colMeans(mse.lin)-c(mean(colMeans(bias.lins2)^2),mean(colMeans(bias.lins1)^2)), c(mean(colMeans(bias.ints2)^2),mean(colMeans(bias.ints1)^2)), colMeans(mse.int)-c(mean(colMeans(bias.ints2)^2),mean(colMeans(bias.ints1)^2)), c(mean(colMeans(bias.b2)^2),mean(colMeans(bias.b1)^2)), colMeans(mse.b)-c(mean(colMeans(bias.b2)^2),mean(colMeans(bias.b1)^2))) #
-pot <- rbind(pot.ora, pot.lin, pot.int, pot.b) #
+value <- rbind(c(mean(colMeans(bias.lins2)^2),mean(colMeans(bias.lins1)^2)), colMeans(mse.lin)-c(mean(colMeans(bias.lins2)^2),mean(colMeans(bias.lins1)^2)), c(mean(colMeans(bias.ints2)^2),mean(colMeans(bias.ints1)^2)), colMeans(mse.int)-c(mean(colMeans(bias.ints2)^2),mean(colMeans(bias.ints1)^2)), c(mean(colMeans(bias.b2)^2),mean(colMeans(bias.b1)^2)), colMeans(mse.b)-c(mean(colMeans(bias.b2)^2),mean(colMeans(bias.b1)^2)), c(mean(colMeans(bias.oras2)^2),mean(colMeans(bias.oras1)^2)), colMeans(mse.ora)-c(mean(colMeans(bias.oras2)^2),mean(colMeans(bias.oras1)^2))) #
+pot <- rbind(pot.lin, pot.int, pot.b, pot.ora) #
 colnames(pot) <- paste0("pot.", colnames(pot))
 pot <- pot[rep(1:nrow(pot), each=2),]
 pot.oraall <- mean(res.ora$a2comb==a2mat & res.ora$a1comb==a1mat)
 pot.linall <- mean(res.lin$a2comb==a2mat & res.lin$a1comb==a1mat)
 pot.intall <- mean(res.int$a2comb==a2mat & res.int$a1comb==a1mat)
 pot.ball <- mean(res.b$a2comb==a2mat & res.b$a1comb==a1mat)
-pot.all <- rep(c(pot.oraall, pot.linall, pot.intall, pot.ball), each=2)
+pot.all <- rep(c(pot.linall, pot.intall, pot.ball, pot.oraall), each=2)
 bardata <- data.frame(method, split, value, pot, pot.all)
 
 stg2plot <- ggplot(bardata)  +

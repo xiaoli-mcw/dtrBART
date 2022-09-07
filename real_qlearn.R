@@ -52,6 +52,7 @@ a1opt <- sapply(1:n*a1n-1, function(column) {which.max(pred.stg1[column:(column+
 a1.opt <- sapply(a1opt, function(x) a1option[x])  #opt action at stg1
 yhat1optmean <- sapply(1:n*a1n-1, function(column) {max(pred.stg1[column:(column+a1n-1)])})
 orig <- list(a2.opt=a2.opt, yhat2optmean=yhat2optmean, a1.opt=a1.opt, yhat1optmean=yhat1optmean, A2.NHTL_0=A2.NHTL_0, A2.NHTL_1=A2.NHTL_1, A1.NHTL_0=A1.NHTL_0, A1.NHTL_1=A1.NHTL_1)
+saveRDS(orig, file="~/BART/a3/results/real_q.RDS")
 
 A1.NHTL0 <- A1.NHTL1 <- A2.NHTL0 <- A2.NHTL1 <- stg2boot <- stg1boot <- NULL
 for (i in 1:nboot){
@@ -207,25 +208,48 @@ pdf(file="~/BART/a3/outputs/real_stg2dfs_qlg.pdf", width=8,height=8)
 p2a
 dev.off()
 
-t <- 2*12  #original Ys are months
+t <- log(2*12)  #original Ys are months
 ## survival probability for each treatment
+sd1 <- apply(log(A1.NHTL1), 1, sd)
+sd2 <- apply(log(A1.NHTL0), 1, sd)
 s1 <- s0 <- NULL
 for (i in 1:nboot){
-    s1 <- cbind(s1, pnorm(q=t, mean=A1.NHTL1[,i], sd=sigma1[i], lower.tail=FALSE))
-    s0 <- cbind(s0, pnorm(q=t, mean=A1.NHTL0[,i], sd=sigma1[i], lower.tail=FALSE))
+    s1 <- cbind(s1, pnorm(q=t, mean=log(A1.NHTL1)[,i], sd=sd1, lower.tail=FALSE))
+    s0 <- cbind(s0, pnorm(q=t, mean=log(A1.NHTL0)[,i], sd=sd2, lower.tail=FALSE))
 }
-sdiff1 <- rowMeans(s1)-rowMeans(s0)
+sdiff1 <- s1-s0
+sdiff1mean <- rowMeans(sdiff1)
+sdiff1ci <- apply(sdiff1, 1, quantile, probs=c(0.025,0.975,0.25,0.75))
+sdiff1sum <- data.frame(mean=sdiff1mean, lowerq=sdiff1ci[1,], upperq=sdiff1ci[2,], q1=sdiff1ci[3,], q3=sdiff1ci[4,])
+sdiff1sum <- sdiff1sum[order(sdiff1sum$mean, decreasing=TRUE),]
+sdiff1sum$x <- 1:nrow(sdiff1sum)
 
+b <- ggplot(sdiff1sum, aes(x=x, y=mean)) + theme(axis.text=element_text(size=16,face="bold"),axis.title=element_text(size=18,face="bold"),title=element_text(size=18,face="bold"))
+smoother <- geom_line(color="black",size=2)
+quartiles <- geom_pointrange(data=sdiff1sum, aes(x=x, y=mean, ymax=q3, ymin=q1), colour="gray30")
+p2a <- b+ geom_pointrange(data=sdiff1sum, aes(x=x, y=mean, ymax=upperq,ymin=lowerq),colour="gray50")+quartiles+smoother+scale_y_continuous("Difference in 2-yr survival probability")+scale_x_continuous("Patient number (Ordered)")+ggtitle("Stage 1")
+pdf(file="~/BART/a3/outputs/real_stg1_2yr_q.pdf", width=8,height=8)
+p2a
+dev.off()
+
+sd1 <- apply(log(A2.NHTL1), 1, sd)
+sd2 <- apply(log(A2.NHTL0), 1, sd)
 s2 <- s0 <- NULL
 for (i in 1:nboot){
-    s2 <- cbind(s2, pnorm(q=t, mean=A2.NHTL1[,i], sd=sigma2[i], lower.tail=FALSE))
-    s0 <- cbind(s0, pnorm(q=t, mean=A2.NHTL0[,i], sd=sigma2[i], lower.tail=FALSE))
+    s2 <- cbind(s2, pnorm(q=t, mean=log(A2.NHTL1)[,i], sd=sd1, lower.tail=FALSE))
+    s0 <- cbind(s0, pnorm(q=t, mean=log(A2.NHTL0)[,i], sd=sd2, lower.tail=FALSE))
 }
-sdiff2 <- rowMeans(s2)-rowMeans(s0)
-pdf(file="~/BART/a3/outputs/real_2yr_q.pdf", width=12, height=6)
-par(mfrow=c(1,2))
-plot(sort(sdiff1, decreasing=TRUE), pch=20, xlab="Patient Index (Ordered)", ylab="Difference in survival probability", main="Stage 1 (NHTL-Standard)")
-abline(h=0, col=2)
-plot(sort(sdiff2, decreasing=TRUE), pch=20, xlab="Patient Index (Ordered)", ylab="Difference in survival probability", main="Stage 2 (NHTL-Standard)")
-abline(h=0, col=2)
+sdiff2 <- s2-s0
+sdiff2mean <- rowMeans(sdiff2)
+sdiff2ci <- apply(sdiff2, 1, quantile, probs=c(0.025,0.975,0.25,0.75))
+sdiff2sum <- data.frame(mean=sdiff2mean, lowerq=sdiff2ci[1,], upperq=sdiff2ci[2,], q1=sdiff2ci[3,], q3=sdiff2ci[4,])
+sdiff2sum <- sdiff2sum[order(sdiff2sum$mean, decreasing=TRUE),]
+sdiff2sum$x <- 1:nrow(sdiff2sum)
+
+b <- ggplot(sdiff2sum, aes(x=x, y=mean)) + theme(axis.text=element_text(size=16,face="bold"),axis.title=element_text(size=18,face="bold"),title=element_text(size=18,face="bold"))
+smoother <- geom_line(color="black",size=2)
+quartiles <- geom_pointrange(data=sdiff2sum, aes(x=x, y=mean, ymax=q3, ymin=q1), colour="gray30")
+p2a <- b+ geom_pointrange(data=sdiff2sum, aes(x=x, y=mean, ymax=upperq,ymin=lowerq),colour="gray50")+quartiles+smoother+scale_y_continuous("Difference in 2-yr survival probability")+scale_x_continuous("Patient number (Ordered)")+ggtitle("Stage 2")
+pdf(file="~/BART/a3/outputs/real_stg2_2yr_q.pdf", width=8,height=8)
+p2a
 dev.off()

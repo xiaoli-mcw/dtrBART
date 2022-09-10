@@ -231,7 +231,7 @@ library(rpart.plot)
 #### Here is nice looking tree figure
 
 pdf(file="~/BART/a3/outputs/fitthefit.pdf")
-rpart.plot(fit,type=4,extra=1,
+rpart.plot(fit,type=4,extra=1,box.palette=0,
 shadow.col="gray", # add shadows just for kicks
 main="Difference in DFS time at Stage 1 \n(NHTL-Standard)\n")
 dev.off()
@@ -264,10 +264,10 @@ node.fun1 <- function(x,labs,digits,varlen)
         }
 
 pdf(file="~/BART/a3/outputs/fitthefit_node.pdf")
-rpart.plot(fit,type=4,extra=1,
+rpart.plot(fit,type=4,extra=1,box.palette=0,
 shadow.col="gray", # add shadows just for kicks
 node.fun=node.fun1, clip.facs=TRUE,
-main="Difference in DFS time at Stage 1 \n(NHTL-Standard)\n")
+main="Difference in DFS time at Stage 1 \n(NHTL vs. Standard)")
 dev.off()
 
 fitteddiff <- data.frame(stg1_diff=rowMeans(yhatdiff1.lg), realdata)
@@ -294,8 +294,8 @@ q72 <- quantile(fitteddiff$stg1_diff[(fitteddiff$related=="Unrelated")&(fitteddi
 fit$frame$lower<-c(q11,q21,q41,q51,q31,q61,q71)
 fit$frame$upper<-c(q12,q22,q42,q52,q32,q62,q72)
 pdf(file="~/BART/a3/outputs/fitthefit_lg.pdf")
-rpart.plot(fit,type=4,extra=1,
+rpart.plot(fit,type=4,extra=1,box.palette=0,
 shadow.col="gray", # add shadows just for kicks
 node.fun=node.fun1, clip.facs=TRUE,
-main="Difference in log(DFS time) at Stage 1 \n(NHTL-Standard)\n")
+main="Difference in log(DFS time) at Stage 1 \n(NHTL vs. Standard)")
 dev.off()

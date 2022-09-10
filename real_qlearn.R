@@ -54,7 +54,7 @@ yhat1optmean <- sapply(1:n*a1n-1, function(column) {max(pred.stg1[column:(column
 orig <- list(a2.opt=a2.opt, yhat2optmean=yhat2optmean, a1.opt=a1.opt, yhat1optmean=yhat1optmean, A2.NHTL_0=A2.NHTL_0, A2.NHTL_1=A2.NHTL_1, A1.NHTL_0=A1.NHTL_0, A1.NHTL_1=A1.NHTL_1)
 saveRDS(orig, file="~/BART/a3/results/real_q.RDS")
 
-A1.NHTL0 <- A1.NHTL1 <- A2.NHTL0 <- A2.NHTL1 <- stg2boot <- stg1boot <- NULL
+A1.NHTL0 <- A1.NHTL1 <- A2.NHTL0 <- A2.NHTL1 <- stg2boot <- stg1boot <- sd1 <- sd2 <- NULL
 for (i in 1:nboot){
     set.seed(seedset[i])
     if (i %% 100 == 0) print(i)
@@ -63,6 +63,7 @@ for (i in 1:nboot){
     boot.stg2 <- bootdata[bootdata$Int2==1,]
     stg2n <- nrow(boot.stg2)
     qstg2 <- survreg(fml2, data=boot.stg2, dist="lognormal")
+    sd2 <- c(sd2, qstg2$scale)
     stg2boot <- rbind(stg2boot, summary(qstg2)$table[,1])
     x.mat <- rbind(boot.stg2,real.stg2)[,c(x2,"A1.NHTL")]
     x.test.stg2 <- data.frame(x.mat[rep(seq_len(nrow(x.mat)), each=a2n),], A2.NHTL=rep(a2option,stg2n+real2n))
@@ -78,6 +79,7 @@ for (i in 1:nboot){
     bootdata[bootdata$Int2==1,]$y2opt <- yhat2optmean[stg2n]
     bootdata$Y1 <- bootdata$Y1.tilde+bootdata$y2opt
     qstg1 <- survreg(fml1, data=bootdata, dist="lognormal")
+    sd1 <- c(sd1, qstg1$scale)
     stg1boot <- rbind(stg1boot, summary(qstg1)$table[,1])
     x.mat <- rbind(bootdata[,x1], realdata[,x1])
     x.test.stg1 <- data.frame(x.mat[rep(seq_len(nrow(x.mat)), each=a1n),], A1.NHTL=rep(a1option,n+n))
@@ -210,12 +212,10 @@ dev.off()
 
 t <- log(2*12)  #original Ys are months
 ## survival probability for each treatment
-sd1 <- apply(log(A1.NHTL1), 1, sd)
-sd2 <- apply(log(A1.NHTL0), 1, sd)
 s1 <- s0 <- NULL
 for (i in 1:nboot){
-    s1 <- cbind(s1, pnorm(q=t, mean=log(A1.NHTL1)[,i], sd=sd1, lower.tail=FALSE))
-    s0 <- cbind(s0, pnorm(q=t, mean=log(A1.NHTL0)[,i], sd=sd2, lower.tail=FALSE))
+    s1 <- cbind(s1, pnorm(q=t, mean=log(A1.NHTL1)[,i], sd=sd1[i], lower.tail=FALSE))
+    s0 <- cbind(s0, pnorm(q=t, mean=log(A1.NHTL0)[,i], sd=sd1[i], lower.tail=FALSE))
 }
 sdiff1 <- s1-s0
 sdiff1mean <- rowMeans(sdiff1)
@@ -232,12 +232,10 @@ pdf(file="~/BART/a3/outputs/real_stg1_2yr_q.pdf", width=8,height=8)
 p2a
 dev.off()
 
-sd1 <- apply(log(A2.NHTL1), 1, sd)
-sd2 <- apply(log(A2.NHTL0), 1, sd)
 s2 <- s0 <- NULL
 for (i in 1:nboot){
-    s2 <- cbind(s2, pnorm(q=t, mean=log(A2.NHTL1)[,i], sd=sd1, lower.tail=FALSE))
-    s0 <- cbind(s0, pnorm(q=t, mean=log(A2.NHTL0)[,i], sd=sd2, lower.tail=FALSE))
+    s2 <- cbind(s2, pnorm(q=t, mean=log(A2.NHTL1)[,i], sd=sd2[i], lower.tail=FALSE))
+    s0 <- cbind(s0, pnorm(q=t, mean=log(A2.NHTL0)[,i], sd=sd2[i], lower.tail=FALSE))
 }
 sdiff2 <- s2-s0
 sdiff2mean <- rowMeans(sdiff2)

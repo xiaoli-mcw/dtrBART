@@ -23,6 +23,18 @@ cen <- cen.init+eta*t1
 delta <- ifelse(eta, ifelse(cen<total, 0, 1), ifelse(cen<t, 0, 1))  # > mean(delta) 0.786
 y2 <- ifelse(eta, ifelse(delta, t2, cen-t1), 0)
 y1 <- ifelse(eta, t1, pmin(t, cen))
-data <- data.frame(delta, eta, t1, t2, t, t2opt, t2opt_true, t_true, a2true, a1true, y1, y2, cen, x1, x2, a1, a2)
+dtrdata <- data.frame(delta, eta, t1, t2, t, t2opt, t2opt_true, t_true, a2true, a1true, y1, y2, cen, x1, x2, a1, a2)
 
-write.csv(data, file="~/BART/a3/codes/dtrdata.csv", row.names=FALSE)
+write.csv(dtrdata, file="~/BART/a3/codes/dtrdata.csv", row.names=FALSE)
+
+library(BART3)
+library(parallel)
+library(doRNG)
+library(doParallel)
+source("~/BART/a3/codes/wrapper.R")
+set.seed(1022)
+ind <- sample(1:n, 800)
+train <- dtrdata[ind,]
+test <- dtrdata[-ind,]
+res.dtr <- dtr1(x1="x1", a1="a1", time1="t1", x2="x2", a2="a2", time2="t2", stg2ind="eta", delta="delta", data=train, newdata=test, opt=FALSE)
+str(res.dtr)

@@ -80,23 +80,23 @@ bardata <- data.frame(method, split, value, pot, pot.all)
 
 stg2plot <- ggplot(bardata)  +
     theme(axis.text=element_text(size=16,face="bold"), axis.title=element_text(size=18,face="bold"), title=element_text(size=18,face="bold"), legend.position="bottom", legend.text=element_text(size=12,face="bold")) +
-    geom_bar(aes(fill=split, y=stg2, x=method), position="stack", stat="identity") + xlab("") + ylab("MSE") + labs(fill="") +
-    geom_line(aes(y=pot.stg2/1.2, x=method, group=1), size=1, color="blue") +
-    geom_point(aes(y=pot.stg2/1.2, x=method, color="Stage 2"), size=3, shape=16) +
-    geom_line(aes(y=pot.all/1.2, x=method, group=1), size=1, color="darkgreen") +
-    geom_point(aes(y=pot.all/1.2, x=method, color="Overall"), size=3, color="darkgreen", shape=16) +
+    geom_bar(aes(fill=split, y=stg2, x=method), position="stack", stat="identity") + scale_fill_grey(start=0.4, end=0.7) + xlab("") + xlab("") + ylab("MSE") + labs(fill="") +
+    geom_line(aes(y=pot.stg2/1.2, x=method, group=1), size=1) +
+    geom_point(aes(y=pot.stg2/1.2, x=method, shape="Stage 2"), size=3) +
+    geom_line(aes(y=pot.all/1.2, x=method, group=1), size=1, linetype="dashed") +
+    geom_point(aes(y=pot.all/1.2, x=method, shape="Overall"), size=3) +
     scale_y_continuous(sec.axis = sec_axis(~.*1.2, name="POT")) +
-    scale_color_manual(values=c("Stage 2"="blue", "Overall"="darkgreen")) + labs(color="POT") +
+    scale_shape_manual(values=c("Stage 2"=2, "Overall"=1)) + labs(shape="POT") +
     ggtitle("Stage 2") 
 stg1plot <- ggplot(bardata)  +
     theme(axis.text=element_text(size=16,face="bold"), axis.title=element_text(size=18,face="bold"), title=element_text(size=18,face="bold"), legend.position="bottom", legend.text=element_text(size=12,face="bold")) +
-    geom_bar(aes(fill=split, y=stg1, x=method), position="stack", stat="identity") + xlab("") + ylab("MSE") + labs(fill="") +
-    geom_line(aes(y=pot.stg1/5.5, x=method, group=1), size=1, color="red") +
-    geom_point(aes(y=pot.stg1/5.5, x=method, color="Stage 1"), size=3, shape=16) +
-    geom_line(aes(y=pot.all/5.5, x=method, group=1), size=1, color="darkgreen") +
-    geom_point(aes(y=pot.all/5.5, x=method, color="Overall"), size=3, color="darkgreen", shape=16) +
+    geom_bar(aes(fill=split, y=stg1, x=method), position="stack", stat="identity") + scale_fill_grey(start=0.4, end=0.7) + xlab("") + xlab("") + ylab("MSE") + labs(fill="") +
+    geom_line(aes(y=pot.stg1/5.5, x=method, group=1), size=1) +
+    geom_point(aes(y=pot.stg1/5.5, x=method, shape="Stage 1"), size=3) +
+    geom_line(aes(y=pot.all/5.5, x=method, group=1), size=1, linetype="dashed") +
+    geom_point(aes(y=pot.all/5.5, x=method, shape="Overall"), size=3) +
     scale_y_continuous(sec.axis = sec_axis(~.*5.5, name="POT")) +
-    scale_color_manual(values=c("Stage 1"="red", "Overall"="darkgreen")) + labs(color="POT") +
+    scale_shape_manual(values=c("Stage 1"=2, "Overall"=1)) + labs(shape="POT") +
     ggtitle("Stage 1")
 
 pdf(file="~/BART/a3/outputs/nln.pdf", width=18, height=9)

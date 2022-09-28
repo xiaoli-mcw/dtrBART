@@ -91,6 +91,7 @@ for (i in 1:nboot){
     A1.NHTL0 <- cbind(A1.NHTL0, A1.NHTL_0)
     A1.NHTL1 <- cbind(A1.NHTL1, A1.NHTL_1)
 }
+saveRDS(list(A1.NHTL0=A1.NHTL0, A1.NHTL1=A1.NHTL1, sd1=sd1, A2.NHTL0=A2.NHTL0, A2.NHTL1=A2.NHTL1, sd2=sd2), file="~/BART/a3/results/real_q_bootstrap.RDS")
 
 stg2sd <- apply(stg2boot, 2, sd)
 plot(colMeans(stg2boot), summary(qstg2)$table[,1])
